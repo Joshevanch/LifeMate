@@ -13,25 +13,24 @@ async function register(req, res) {
 async function login(req, res) {
   try {
     const result = await lifemateService.login(req.body);
-    if (result.message === "Login successful") {
-      const token = generateToken(result.idUser);
-      res.json({ ...result, token });
-    } else {
-      res.json(result);
-    }
+    res.json(result);
   } catch (err) {
     res.json(err.detail);
   }
 }
 
-function generateToken(idUser) {
-  const payload = { idUser };
-  const secretKey = "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N";
-  const options = { expiresIn: "1h" }; 
-  return jwt.sign(payload, secretKey, options);
+async function testProtected(req,res){
+  try {
+    const result = await lifemateService.testProtected(req.body);
+    res.json(result);
+  } catch (err) {
+    res.json(err.detail);
+  }
 }
+
 
 module.exports = {
   register,
   login,
+  testProtected
 };

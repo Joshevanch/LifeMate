@@ -1,6 +1,7 @@
 const e = require("express");
 const db = require("../config/config");
 const jwt = require("jsonwebtoken");
+const middleware = require ("../middleware/auth")
 
 async function register(body) {
   const { name, email, password } = body;
@@ -34,9 +35,11 @@ async function login(body) {
   else {
     const user = result.rows[0];
     if (password === user.password){
+      const token = await middleware.generateToken(user.id)
       return {
         message: "Login successful",
         idUser: user.id,
+        token: token,
       };
     }
     else {
@@ -47,23 +50,14 @@ async function login(body) {
   }
 }
 
-function verifyToken(req, res, next) {
-  const token = req.headers["authorization"];
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  const secretKey = "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N"; 
-  jwt.verify(token, secretKey, (err, decoded)=> {
-    if (err) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    req.userId = decoded.idUser;
-    next();
-  });
+async function testProtected(body) {
+  return {
+    message: "Protected route accessed successfully"
+  };
 }
 
 module.exports = {
   register,
   login,
-  verifyToken,
+  testProtected
 };
