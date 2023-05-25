@@ -1,16 +1,18 @@
+const path = require ('path')
 const { Client } = require('pg')
+require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 
 const db = new Client({
-    host : '34.101.188.135',
-    user : 'postgres',
-    port : 5432,
-    database : 'lifemate',
-    ssl: { rejectUnauthorized: false }
-
+    host : process.env.host,
+    user : process.env.user,
+    port : process.env.port,
+    password : process.env.password,
+    database : process.env.database,
 })
 
 db.connect((err) => {
     if (err) {
+        console.log(__dirname)
         console.log(err)
         return
     }
