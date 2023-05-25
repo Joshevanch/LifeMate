@@ -1,6 +1,7 @@
 const e = require("express");
 const db = require("../config/config");
 const jwt = require("jsonwebtoken");
+const security = require("../utils/security")
 const middleware = require ("../middleware/auth")
 
 async function register(body) {
@@ -10,7 +11,9 @@ async function register(body) {
       message: "Empty value",
     };
   }
-  const query = `INSERT INTO account (NAME, EMAIL, PASSWORD) VALUES ('${name}', '${email}','${password}')`;
+  const hashPassword = await security.hashPassword(password)
+  console.log(hashPassword)
+  const query = `INSERT INTO account (NAME, EMAIL, PASSWORD) VALUES ('${name}', '${email}','${hashPassword}')`;
   const result = await db.query(query);
   if (result.rowCount !== 0) {
     return {
@@ -34,7 +37,7 @@ async function login(body) {
   } 
   else {
     const user = result.rows[0];
-    if (password === user.password){
+    if (await security.comparePassword(password, user.password)){
       const token = await middleware.generateToken(user.id)
       return {
         message: "Login successful",
