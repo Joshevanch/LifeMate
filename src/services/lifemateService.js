@@ -5,15 +5,14 @@ const security = require("../utils/security")
 const middleware = require ("../middleware/auth")
 
 async function register(body) {
-  const { name, email, password } = body;
-  if (!name || !email || !password) {
+  const { name, email, password, gender, birthDate } = body;
+  if (!name || !email || !password || !gender || !birthDate) {
     return {
       message: "Empty value",
     };
   }
   const hashPassword = await security.hashPassword(password)
-  console.log(hashPassword)
-  const query = `INSERT INTO account (NAME, EMAIL, PASSWORD) VALUES ('${name}', '${email}','${hashPassword}')`;
+  const query = `INSERT INTO account (NAME, EMAIL, PASSWORD, GENDER, BIRTHDATE) VALUES ('${name}', '${email}','${hashPassword}', '${gender}', '${birthDate}')`;
   const result = await db.query(query);
   if (result.rowCount !== 0) {
     return {
@@ -59,8 +58,30 @@ async function testProtected(body) {
   };
 }
 
+async function getUserById(body){
+  const {id} = body
+  const query = `SELECT * FROM account WHERE id = ${id}`;
+  const result = await db.query(query);
+  user = result.rows[0]
+  console.log(user)
+  if (result.rows.length === 0) {
+    return {
+      message: "User not found",
+    };
+  } 
+  else{
+    return {
+      idUser: user.id,
+      name: user.name,
+      email: user.email,
+      gender: user.gender,
+      birthDate: user.birthdate
+    };
+  }
+}
 module.exports = {
   register,
   login,
-  testProtected
+  testProtected,
+  getUserById
 };

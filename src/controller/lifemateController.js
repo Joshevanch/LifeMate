@@ -28,9 +28,19 @@ async function testProtected(req,res){
   }
 }
 
+async function getUserById(req,res){
+  try {
+    const result = await lifemateService.getUserById(req.params);
+    res.json(result);
+  } catch (err) {
+    res.json(err.detail);
+  }
+}
+
 
 module.exports = {
   register,
   login,
-  testProtected
+  testProtected,
+  getUserById
 };
