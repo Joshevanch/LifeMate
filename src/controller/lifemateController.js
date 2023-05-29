@@ -6,8 +6,14 @@ async function register(req, res) {
     const result = await lifemateService.register(req.body);
     res.json(result);
   } catch (err) {
-    res.json(err.detail);
-  }
+    if(err.code == 23505){
+      const message = { message: "User already exists",}
+      res.json(message)
+    }
+    else{
+      res.json(err.detail);
+    }
+    }
 }
 
 async function login(req, res) {
@@ -37,10 +43,40 @@ async function getUserById(req,res){
   }
 }
 
+async function insertRecord(req,res){
+  try {
+    const result = await lifemateService.insertRecord(req.body);
+    res.json(result);
+  } catch (err) {
+    res.json(err.detail);
+  }
+}
+
+async function deleteRecord(req,res){
+  try {
+    const result = await lifemateService.deleteRecord(req.params);
+    res.json(result);
+  } catch (err) {
+    res.json(err.detail);
+  }
+}
+
+async function getRecordById(req,res){
+  try {
+    const result = await lifemateService.getRecordById(req.params);
+    res.json(result);
+  } catch (err) {
+    res.json(err.detail);
+  }
+}
+
 
 module.exports = {
   register,
   login,
   testProtected,
-  getUserById
+  getUserById,
+  insertRecord,
+  deleteRecord,
+  getRecordById
 };

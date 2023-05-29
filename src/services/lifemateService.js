@@ -18,7 +18,8 @@ async function register(body) {
     return {
       message: "User Created",
     };
-  } else {
+  } 
+  else {
     return {
       message: "Error",
     };
@@ -59,11 +60,10 @@ async function testProtected(body) {
 }
 
 async function getUserById(body){
-  const {id} = body
-  const query = `SELECT * FROM account WHERE id = ${id}`;
+  const {userId} = body
+  const query = `SELECT * FROM account WHERE id = ${userId}`;
   const result = await db.query(query);
   user = result.rows[0]
-  console.log(user)
   if (result.rows.length === 0) {
     return {
       message: "User not found",
@@ -79,9 +79,84 @@ async function getUserById(body){
     };
   }
 }
+
+async function insertRecord(body){
+  const {idUser, height, weight, weeklyToDoList, userHelp, achievement, selfReward} = body
+  if (!idUser || !height || !weight || !weeklyToDoList || !userHelp || !achievement || !selfReward){
+    return {
+      message: "Empty body"
+    }
+  }
+  let query = `SELECT * FROM account where id = ${idUser};`
+  const tempUser = await db.query(query)
+  if (tempUser.rows[0] === 0 ){
+    return {
+      message: "Error"
+    }
+  }
+  const user = tempUser.rows[0]
+  if (user.gender === 'laki-laki'){
+
+  }
+  if (user.gender === 'perempuan'){
+
+  }
+  query = `INSERT INTO RECORD (height, weight, weeklytodolist, userhelp, achievement, selfreward, obesity, stress) VALUES (${height}, ${weight}, ${weeklyToDoList}, 
+    ${userHelp}, ${achievement}, ${selfReward}, 1, 2 ); INSERT INTO ACCOUNTRECORD (accountid) values ('${idUser}');`;
+  const result = await db.query(query);
+  if (result[0].rowCount !== 0 && result[1].rowCount !== 0){
+    return {
+      message: "Record inserted",
+      obesity: "normal",
+      stress: "normal"
+    };
+  }
+  else{
+    return{
+      message: "Error inserting record"
+    }
+  }
+}
+
+async function deleteRecord(body){
+  const {recordId} = body
+  let query = `DELETE FROM RECORD where id = ${recordId}; DELETE FROM ACCOUNTRECORD where recordid = ${recordId};`
+  const result = await db.query(query);
+  if (result[0].rowCount !== 0 && result[1].rowCount !== 0){
+    return {
+      message: "Record deleted",
+    };
+  }
+  else{
+    return{
+      message: "Error deleting record"
+    }
+  }
+}
+
+async function getRecordById(body){
+  const {userId} = body
+  let query = `SELECT * FROM RECORD INNER JOIN ACCOUNTRECORD on RECORD.ID = ACCOUNTRECORD.RECORDID WHERE ACCOUNTRECORD.ACCOUNTID = ${userId};`
+  const result = await db.query(query);
+  if (result.rowCount !== 0){
+    return {
+      result: result.rows
+    };
+  }
+  else{
+    return{
+      message: "Error getting record"
+    }
+  }
+}
+
+
 module.exports = {
   register,
   login,
   testProtected,
-  getUserById
+  getUserById,
+  insertRecord,
+  deleteRecord,
+  getRecordById
 };
