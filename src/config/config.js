@@ -9,10 +9,11 @@ const db = new Client({
     password : process.env.password,
     database : process.env.database,
 })
-
+db._types.setTypeParser(1184, function(stringValue) {
+    return new Date(stringValue + "+0000");
+})
 db.connect((err) => {
     if (err) {
-        console.log(__dirname)
         console.log(err)
         return
     }
